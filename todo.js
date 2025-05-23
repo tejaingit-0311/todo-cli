@@ -1,11 +1,12 @@
 const { Command } = require('commander');
 const program = new Command(); 
-
+const fs = require('fs');
 let todos = [{
     id: "",
     status: false,
     description: ""
 }]
+const filePath = './todos.json';
 let id = 0;
 //name a command
 //give description about what it does
@@ -15,20 +16,7 @@ program
     .description('View, Add, Update and Delete, your Tasks Here')
 
 
-//add:
-// command :  todo add <description>:
 
-//view:
-// command : todo list
-    //options:
-    //todo list --completed     # Only completed tasks
-    //todo list --pending      # Only pending tasks
-
-//update:
-// command : todo update <id-to-update> <task-to-update-with> 
-
-//delete:
-// command : task delete <id-to-delete>
 
 //add-command:
 program
@@ -51,5 +39,28 @@ program
     })
 
 //view-command:
+program
+    .command("list")
+    .description("list all the tasks")
+    .action(()=>{
+        fs.readFile(filePath,'utf-8',function(err, data){
+            if(err) throw err;
+            //console.log(data);
+            let todosJson = JSON.parse(data);
+            let todos = todosJson.todos;
+            for(let todo of todos){
+                //console.log(todo);
+                let isComplete = ""
+                if(todo.status){
+                    isComplete="Completed";
+                }else{
+                    isComplete="Not Completed";
+                }
+                console.log(`Description : ${todo.description}, Status: ${isComplete}`);
+            }
+           
+        });
+
+    })
 
 program.parse();
