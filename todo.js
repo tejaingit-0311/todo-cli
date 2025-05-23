@@ -14,7 +14,7 @@ let id = 0;
 program
     .name('todo')
     .description('View, Add, Update and Delete, your Tasks Here')
-
+    .version('1.0.1')
 
 
 
