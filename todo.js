@@ -1,6 +1,6 @@
 const { Command } = require('commander');
 const program = new Command(); 
-const fs = require('fs');
+const fsPromises = require('fs').promises;
 let todos = [{
     id: "",
     status: false,
@@ -42,14 +42,13 @@ program
 program
     .command("list")
     .description("list all the tasks")
-    .action(()=>{
-        fs.readFile(filePath,'utf-8',function(err, data){
-            if(err) throw err;
-            //console.log(data);
-            let todosJson = JSON.parse(data);
-            let todos = todosJson.todos;
-            for(let todo of todos){
-                //console.log(todo);
+    .action(async ()=>{
+        try{
+            const data = await fsPromises.readFile(filePath,'utf-8');
+            const todosJson = JSON.parse(data);
+            const todos = todosJson.todos;
+           
+            todos.forEach((todo)=>{
                 let isComplete = ""
                 if(todo.status){
                     isComplete="Completed";
@@ -57,10 +56,10 @@ program
                     isComplete="Not Completed";
                 }
                 console.log(`Description : ${todo.description}, Status: ${isComplete}`);
-            }
-           
-        });
-
-    })
+            })
+        }catch(error){
+            console.error("Failed to update task:", error.message);
+        }
+    });
 
 program.parse();
