@@ -1,6 +1,6 @@
 const { Command } = require('commander');
 const program = new Command(); 
-const fs = require('fs');
+const fsPromises = require('fs').promises;
 let todos = [{
     id: "",
     status: false,
@@ -14,7 +14,7 @@ let id = 0;
 program
     .name('todo')
     .description('View, Add, Update and Delete, your Tasks Here')
-    .version('1.0.1')
+    .version('1.0.2')
 
 
 
@@ -42,25 +42,20 @@ program
 program
     .command("list")
     .description("list all the tasks")
-    .action(()=>{
-        fs.readFile(filePath,'utf-8',function(err, data){
-            if(err) throw err;
-            //console.log(data);
-            let todosJson = JSON.parse(data);
-            let todos = todosJson.todos;
-            for(let todo of todos){
-                //console.log(todo);
-                let isComplete = ""
-                if(todo.status){
-                    isComplete="Completed";
-                }else{
-                    isComplete="Not Completed";
-                }
-                console.log(`Description : ${todo.description}, Status: ${isComplete}`);
-            }
-           
-        });
-
-    })
+    .action(async ()=>{
+        try{
+            //get the data:
+            let data = await fsPromises.readFile(filePath,'utf-8');
+            //parse into object:
+                let todos = JSON.parse(data).todos;
+            //display the data
+               todos.forEach((todo)=>{
+                const status = todo.status ? "Completed" : "Not Completed";
+                console.log(`Description: ${todo.description}, Status: ${status}`);
+               });
+        }catch(error){
+            console.error(error);
+        }
+    });
 
 program.parse();
