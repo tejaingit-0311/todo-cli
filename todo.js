@@ -13,7 +13,7 @@ let id = 0;
 program
     .name('todo')
     .description('View, Add, Update and Delete, your Tasks Here')
-    .version('1.0.2')
+    .version('1.0.3')
 
 
 //add-command:
@@ -55,5 +55,38 @@ program
             console.error(error);
         }
     });
+
+//update-command:
+// read-file->data.id === id-> data.desc = description->write data into file
+
+program
+    .command('update')
+    .description('Updates the existing task')
+    .argument("<id>", "id of which task has to be updated")
+    .argument("<description>", "add a description")
+    .action(async (idArg, description)=>{
+        //parse into number:
+        let id = parseInt(idArg, 10);
+        try{
+            //read file to get data:
+            let data = await fsPromises.readFile(filePath, "utf-8");
+            //parse JSON into object and extract todos[]:
+            let todos = JSON.parse(data).todos;
+            //iterate on array and find id:
+            let index = todos.findIndex((todo)=> todo.id === id);
+            if(index === -1)
+                throw "Id Not Found";
+            //add desc:
+            todos[index].description=description;
+            //parse back object into JSON:
+            let todosJson = JSON.stringify({todos});
+            //write into file:
+            await fsPromises.writeFile(filePath,todosJson);
+            console.log("Successfully Updated");
+        }catch(error){
+            console.error(`Failed to update as: ${error}`);
+        }
+
+    })
 
 program.parse();
