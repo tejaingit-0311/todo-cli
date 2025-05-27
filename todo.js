@@ -6,6 +6,7 @@ let todos = [{
     status: false,
     description: ""
 }]
+const filePath = './todos.json';
 let id = 0;
 //name a command
 //give description about what it does
