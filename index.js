@@ -1,6 +1,6 @@
 const { Command } = require('commander');
 const program = new Command(); 
-
+const fsPromises = require('fs').promises;
 let todos = [{
     id: "",
     status: false,
@@ -13,22 +13,8 @@ let id = 0;
 program
     .name('todo')
     .description('View, Add, Update and Delete, your Tasks Here')
+    .version('1.0.2')
 
-
-//add:
-// command :  todo add <description>:
-
-//view:
-// command : todo list
-    //options:
-    //todo list --completed     # Only completed tasks
-    //todo list --pending      # Only pending tasks
-
-//update:
-// command : todo update <id-to-update> <task-to-update-with> 
-
-//delete:
-// command : task delete <id-to-delete>
 
 //add-command:
 program
@@ -51,5 +37,23 @@ program
     })
 
 //view-command:
+program
+    .command("list")
+    .description("list all the tasks")
+    .action(async ()=>{
+        try{
+            //get the data:
+            let data = await fsPromises.readFile(filePath,'utf-8');
+            //parse into object:
+                let todos = JSON.parse(data).todos;
+            //display the data
+               todos.forEach((todo)=>{
+                const status = todo.status ? "Completed" : "Not Completed";
+                console.log(`Description: ${todo.description}, Status: ${status}`);
+               });
+        }catch(error){
+            console.error(error);
+        }
+    });
 
 program.parse();
