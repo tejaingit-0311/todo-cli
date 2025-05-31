@@ -90,4 +90,37 @@ program
 
     })
 
+//delete-command:
+// read-file->data.id === id->splice(index,1)->write data into file
+program
+    .command("delete")
+    .description("Deletes the existing Task")
+    .argument("<id>", "id of which task has to be updated")
+    .action(async (idArg)=>{
+        //covert idArg into number:
+        const id = parseInt(idArg);
+        try{
+            //read-file to get data:
+            let data = await fsPromises.readFile(filePath,"utf-8");
+            //parse into object:
+            const todos = JSON.parse(data).todos;
+            //iterate on array and find the index:
+            //validate and then delete:
+            console.log(todos);
+            const index = todos.findIndex((todo)=> todo.id === id);
+            if(index === -1){
+                throw "Id Not Found";
+            }
+            todos.splice(index,1);
+            //parse back into JSON:
+            const todosData = JSON.stringify({todos});
+            //write back into the file:
+            await fsPromises.writeFile(filePath, todosData);
+            console.log("Task deleted successfully...");
+            console.log(todos);
+
+        }catch(error){
+            console.error(`Failed to update as: ${error}`);
+        }
+    })
 program.parse();
